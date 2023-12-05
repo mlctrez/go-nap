@@ -228,20 +228,34 @@ func (d *element) ParentDataNap(suffixes ...string) string {
 	}
 	return ""
 }
+
 func (d *element) FilterAttributes(prefix string) []xml.Attr {
 	var result []xml.Attr
 	for _, attribute := range d.attributes {
-		if attribute.Name.Local != prefix {
+		if !strings.HasPrefix(attribute.Name.Local, prefix) {
 			result = append(result, attribute)
 		}
 	}
 	return result
 }
 
-func (d *element) declaration(group *jen.Group) {
-	if d.DataNap("omit") == "true" {
-		return
+func (d *element) FilterChildren(suffix string) []*element {
+	if len(d.children) == 0 {
+		return nil
 	}
+	var result []*element
+	for _, child := range d.children {
+		if child.DataNap(suffix) == "" {
+			result = append(result, child)
+		}
+	}
+	return result
+}
+
+func (d *element) declaration(group *jen.Group) {
+	//if d.DataNap("omit") == "true" {
+	//	return
+	//}
 	if d.name == "#text" {
 		group.Qual(NapPkg, "Text").Parens(jen.Lit(d.Get("data")))
 		return
@@ -274,14 +288,19 @@ func (d *element) declaration(group *jen.Group) {
 	})
 	prefix := d.ParentDataNap("prefix")
 	if len(d.children) > 0 {
-		ret.Op(".").Line().Id("Append").ParamsFunc(func(group *jen.Group) {
-			for _, child := range d.children {
-				if child.DataNap() != "" {
-					group.Id("r").Op(".").Line().Id("Elm").Params(jen.Id(uc(prefix) + uc(child.DataNap())))
-				} else {
-					child.declaration(group)
+		filteredChildren := d.FilterChildren("omit")
+		if len(filteredChildren) > 0 {
+			ret.Op(".").Line().Id("Append").ParamsFunc(func(group *jen.Group) {
+				for _, child := range filteredChildren {
+					if child.DataNap() != "" {
+						group.Id("r").Op(".").Line().Id("Elm").Params(jen.Id(uc(prefix) + uc(child.DataNap())))
+					} else {
+						child.declaration(group)
+					}
 				}
-			}
-		})
+			})
+
+		}
+
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mlctrez/go-nap/nap/enc"
 	"github.com/mlctrez/go-nap/nap/jsa"
+	"strings"
 )
 
 type Elm interface {
@@ -20,6 +21,7 @@ type Elm interface {
 	Text(data string) Elm
 
 	Find(name ...string) Elm
+	FindPath(path string) Elm
 	First(name string) Elm
 	All(name string) []Elm
 	Children() []Elm
@@ -27,10 +29,6 @@ type Elm interface {
 
 	Encode(encoder *xml.Encoder) error
 	String() string
-
-	//Prepend(el ...Elm) Elm
-	//With(func(el Elm)) Elm
-
 }
 
 type M map[string]any
@@ -125,6 +123,10 @@ func (e *elem) Append(el ...Elm) Elm {
 
 func (e *elem) Children() []Elm {
 	return e.children
+}
+
+func (e *elem) FindPath(path string) Elm {
+	return e.Find(strings.Split(path, "/")...)
 }
 
 func (e *elem) Find(name ...string) Elm {

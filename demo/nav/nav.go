@@ -3,28 +3,33 @@ package nav
 import nap "github.com/mlctrez/go-nap/nap"
 
 const NavbarNav = "navbar/nav"
-const NavbarBrand = "navbar/brand"
 const NavbarItems = "navbar/items"
-const NavbarDropdown = "navbar/dropdown"
+const NavbarActiveNavItem = "navbar/activeNavItem"
+const NavbarInactiveNavItem = "navbar/inactiveNavItem"
+const NavbarDropdownNavItem = "navbar/dropdownNavItem"
 const NavbarDropdownMenu = "navbar/dropdownMenu"
+const NavbarDisabledNavItem = "navbar/disabledNavItem"
 const NavbarSearchForm = "navbar/searchForm"
 
 func Navbar(r nap.Router) {
 	r.ElmFunc(NavbarNav, Nav)
-	r.ElmFunc(NavbarBrand, Brand)
 	r.ElmFunc(NavbarItems, Items)
-	r.ElmFunc(NavbarDropdown, Dropdown)
+	r.ElmFunc(NavbarActiveNavItem, ActiveNavItem)
+	r.ElmFunc(NavbarInactiveNavItem, InactiveNavItem)
+	r.ElmFunc(NavbarDropdownNavItem, DropdownNavItem)
 	r.ElmFunc(NavbarDropdownMenu, DropdownMenu)
+	r.ElmFunc(NavbarDisabledNavItem, DisabledNavItem)
 	r.ElmFunc(NavbarSearchForm, SearchForm)
 }
 
 func Nav(r nap.Router) nap.Elm {
 	return r.
-		E("nav", nap.M{"class": "navbar navbar-expand-lg bg-body-tertiary", "data-nap-prefix": "navbar", "data-nap-key": "navbar"}).
+		E("nav", nap.M{"class": "navbar navbar-expand-lg bg-body-tertiary"}).
 		Append(r.
 			E("div", nap.M{"class": "container-fluid"}).
 			Append(r.
-				Elm(NavbarBrand), r.
+				E("a", nap.M{"class": "navbar-brand", "href": "/"}).
+				Append(nap.Text("Navbar")), r.
 				E("button", nap.M{
 					"class":          "navbar-toggler",
 					"type":           "button",
@@ -38,36 +43,31 @@ func Nav(r nap.Router) nap.Elm {
 					E("span", nap.M{"class": "navbar-toggler-icon"})), r.
 				E("div", nap.M{"class": "collapse navbar-collapse", "id": "navbarSupportedContent"}).
 				Append(r.
-					Elm(NavbarItems), r.
-					Elm(NavbarSearchForm))))
-}
-
-func Brand(r nap.Router) nap.Elm {
-	return r.
-		E("a", nap.M{"class": "navbar-brand", "href": "/"}).
-		Append(nap.Text("Navbar foo"))
+					Elm(NavbarItems))))
 }
 
 func Items(r nap.Router) nap.Elm {
 	return r.
-		E("ul", nap.M{"class": "navbar-nav me-auto mb-2 mb-lg-0"}).
-		Append(r.
-			E("li", nap.M{"class": "nav-item"}).
-			Append(r.
-				E("a", nap.M{"class": "nav-link active", "aria-current": "page", "href": "/"}).
-				Append(nap.Text("Home"))), r.
-			E("li", nap.M{"class": "nav-item"}).
-			Append(r.
-				E("a", nap.M{"class": "nav-link", "href": "/"}).
-				Append(nap.Text("Link"))), r.
-			Elm(NavbarDropdown), r.
-			E("li", nap.M{"class": "nav-item"}).
-			Append(r.
-				E("a", nap.M{"class": "nav-link disabled", "aria-disabled": "true"}).
-				Append(nap.Text("Disabled"))))
+		E("ul", nap.M{"class": "navbar-nav me-auto mb-2 mb-lg-0"})
 }
 
-func Dropdown(r nap.Router) nap.Elm {
+func ActiveNavItem(r nap.Router) nap.Elm {
+	return r.
+		E("li", nap.M{"class": "nav-item"}).
+		Append(r.
+			E("a", nap.M{"class": "nav-link active", "aria-current": "page", "href": "/"}).
+			Append(nap.Text("Home")))
+}
+
+func InactiveNavItem(r nap.Router) nap.Elm {
+	return r.
+		E("li", nap.M{"class": "nav-item"}).
+		Append(r.
+			E("a", nap.M{"class": "nav-link", "href": "/"}).
+			Append(nap.Text("Link")))
+}
+
+func DropdownNavItem(r nap.Router) nap.Elm {
 	return r.
 		E("li", nap.M{"class": "nav-item dropdown"}).
 		Append(r.
@@ -100,6 +100,14 @@ func DropdownMenu(r nap.Router) nap.Elm {
 			Append(r.
 				E("a", nap.M{"class": "dropdown-item", "href": "/"}).
 				Append(nap.Text("Something else here"))))
+}
+
+func DisabledNavItem(r nap.Router) nap.Elm {
+	return r.
+		E("li", nap.M{"class": "nav-item"}).
+		Append(r.
+			E("a", nap.M{"class": "nav-link disabled", "aria-disabled": "true"}).
+			Append(nap.Text("Disabled")))
 }
 
 func SearchForm(r nap.Router) nap.Elm {

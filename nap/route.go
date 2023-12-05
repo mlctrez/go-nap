@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mlctrez/go-nap/nap/jsa"
 	"net/url"
+	"strings"
 )
 
 type Router interface {
@@ -22,7 +23,6 @@ type Router interface {
 	Page(u *url.URL) Elm
 
 	E(nodeName string, attr ...M) Elm
-	Override(name string, elm Elm) Elm
 }
 
 type RegFunc func(r Router)
@@ -41,18 +41,21 @@ type router struct {
 	ops        chan func()
 }
 
-func (r *router) Override(name string, elm Elm) Elm {
-	//fmt.Println("Override for", name)
-	return elm
-}
-
 func (r *router) E(nodeName string, attr ...M) Elm {
 	el := El(nodeName, attr...)
 	for _, at := range attr {
 		for k, v := range at {
 			if k == "href" {
-				if href, ok := v.(string); ok {
-					el.Listen("click", r.NavigateFunc(&url.URL{Path: href}))
+				if _, ok := v.(string); ok {
+					el.Listen("click", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
+						args[0].PreventDefault()
+						u, err := url.Parse(this.Get("href").String())
+						if err == nil {
+							r.Navigate(u)
+						}
+						return nil
+					}))
+					//el.Listen("click", r.NavigateFunc(&url.URL{Path: href}))
 				}
 			}
 		}
@@ -79,6 +82,10 @@ func (r *router) Elm(name string) Elm {
 	if ef, ok := r.components[name]; ok {
 		return ef(r)
 	}
+	if strings.HasPrefix(name, "_body") {
+		return El("body", M{"style": "color:red"}).
+			Text(fmt.Sprintf("element %q not found", name))
+	}
 	return El("div", M{"style": "color:red"}).
 		Text(fmt.Sprintf("element %q not found", name))
 }
@@ -88,6 +95,7 @@ func (r *router) ElmFunc(name string, elmFunc ElmFunc) {
 }
 
 func (r *router) Navigate(u *url.URL) {
+	fmt.Println("navigate", u)
 	jsa.AddHistory(u.String())
 	jsa.Body().Call("replaceWith", r.Body(u))
 }

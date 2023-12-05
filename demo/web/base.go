@@ -4,20 +4,17 @@ import nap "github.com/mlctrez/go-nap/nap"
 
 const BaseHtml = "base/html"
 const BaseHeader = "base/header"
-const BaseBody = "base/body"
 
 func Base(r nap.Router) {
 	r.ElmFunc(BaseHtml, Html)
 	r.ElmFunc(BaseHeader, Header)
-	r.ElmFunc(BaseBody, Body)
 }
 
 func Html(r nap.Router) nap.Elm {
 	return r.
-		E("html", nap.M{"data-bs-theme": "dark", "lang": "en", "data-nap-prefix": "base"}).
+		E("html", nap.M{"data-bs-theme": "dark", "lang": "en"}).
 		Append(r.
-			Elm(BaseHeader), r.
-			Elm(BaseBody))
+			Elm(BaseHeader))
 }
 
 func Header(r nap.Router) nap.Elm {
@@ -32,9 +29,4 @@ func Header(r nap.Router) nap.Elm {
 			E("script", nap.M{"src": "runtime.js"}), r.
 			E("title").
 			Append(nap.Text("demo")))
-}
-
-func Body(r nap.Router) nap.Elm {
-	return r.
-		E("body")
 }
