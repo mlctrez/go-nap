@@ -49,7 +49,7 @@ func Generate(html string) (err error) {
 	defer func() { _ = open.Close() }()
 
 	var root *element
-	if root, err = Parse(open); err != nil {
+	if root, err = parse(open); err != nil {
 		return err
 	}
 
@@ -62,27 +62,29 @@ func Generate(html string) (err error) {
 
 	allDataNap := root.allDataNap()
 	for _, dn := range allDataNap {
-		f.Const().Id(uc(pfx) + uc(dn.DataNap())).
-			Op("=").Lit(pfx + "/" + dn.DataNap())
+		f.Const().Id(uc(pfx) + uc(dn.DataNap())).Op("=").Lit(pfx + "/" + dn.DataNap())
 	}
 
 	rRouter := jen.Id("r").Qual(NapPkg, "Router")
 	f.Func().Id(uc(pfx)).Params(rRouter).
 		BlockFunc(func(group *jen.Group) {
 			for _, dn := range allDataNap {
-				dnPage := dn.DataNap("page")
 				methodName := jen.Id(uc(dn.DataNap()))
+
+				dnPage := dn.DataNap("page")
 				if dnPage != "" {
 					group.Id("r").Dot("ElmFunc").Params(
 						jen.Id("page-"+dnPage), methodName,
 					)
 				}
-				dnBody := dn.DataNap("page")
+
+				dnBody := dn.DataNap("body")
 				if dnBody != "" {
 					group.Id("r").Dot("ElmFunc").Params(
-						jen.Id("page-"+dnBody), methodName,
+						jen.Id("body-"+dnBody), methodName,
 					)
 				}
+
 				group.Id("r").Dot("ElmFunc").Params(
 					jen.Id(uc(pfx)+uc(dn.DataNap())), methodName,
 				)
@@ -120,7 +122,7 @@ func uc(in string) string {
 	}
 }
 
-func Parse(file io.Reader) (el *element, err error) {
+func parse(file io.Reader) (el *element, err error) {
 	var parents []*element
 	charBuffer := bytes.NewBufferString("")
 	decoder := xml.NewDecoder(file)
@@ -253,9 +255,6 @@ func (d *element) FilterChildren(suffix string) []*element {
 }
 
 func (d *element) declaration(group *jen.Group) {
-	//if d.DataNap("omit") == "true" {
-	//	return
-	//}
 	if d.name == "#text" {
 		group.Qual(NapPkg, "Text").Parens(jen.Lit(d.Get("data")))
 		return
@@ -279,8 +278,7 @@ func (d *element) declaration(group *jen.Group) {
 		default:
 			g.Lit(d.name).Op(",").Qual(NapPkg, "M").BlockFunc(func(group *jen.Group) {
 				for _, attr := range attributes {
-					name := attr.Name.Local
-					group.Lit(name).Op(":").Lit(attr.Value).Op(",")
+					group.Lit(attr.Name.Local).Op(":").Lit(attr.Value).Op(",")
 				}
 			})
 		}
@@ -299,8 +297,6 @@ func (d *element) declaration(group *jen.Group) {
 					}
 				}
 			})
-
 		}
-
 	}
 }
