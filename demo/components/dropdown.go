@@ -17,7 +17,7 @@ func Dropdown(r nap.Router) nap.Elm {
 	return r.E("div").Set("class", "dropdown").
 		Append(
 			r.E("button").
-				Set("class", "btn btn-secondary dropdown-toggle").
+				Set("class", "btn btn-primary dropdown-toggle").
 				Set("type", "button").
 				Set("data-bs-toggle", "dropdown").
 				Set("aria-expanded", "false").

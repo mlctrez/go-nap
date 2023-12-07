@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mlctrez/go-nap/nap/enc"
 	"github.com/mlctrez/go-nap/nap/jsa"
+	"runtime"
 	"strings"
 )
 
@@ -49,13 +50,13 @@ func elFinalizer(e *elem) {
 
 func El(nodeName string, attr ...M) Elm {
 	el := &elem{nodeName: nodeName, node: jsa.CreateElement(nodeName)}
-	//runtime.SetFinalizer(el, elFinalizer)
+	runtime.SetFinalizer(el, elFinalizer)
 	return el.SetAttr(attr...)
 }
 
 func ElNS(ns, nodeName string, attr ...M) Elm {
 	el := &elem{nodeName: nodeName, node: jsa.CreateElementNS(ns, nodeName)}
-	//runtime.SetFinalizer(el, elFinalizer)
+	runtime.SetFinalizer(el, elFinalizer)
 	return el.SetAttr(attr...)
 }
 
@@ -83,7 +84,6 @@ func (e *elem) ReplaceChild(old, new Elm) {
 			old.Value().Call("replaceWith", new.Value())
 		}
 	}
-
 }
 
 func (e *elem) SetAttr(attr ...M) Elm {

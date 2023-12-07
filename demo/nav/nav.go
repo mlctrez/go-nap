@@ -6,9 +6,11 @@ const NavbarNav = "navbar/nav"
 const NavbarItems = "navbar/items"
 const NavbarActiveNavItem = "navbar/activeNavItem"
 const NavbarInactiveNavItem = "navbar/inactiveNavItem"
+const NavbarDisabledNavItem = "navbar/disabledNavItem"
 const NavbarDropdownNavItem = "navbar/dropdownNavItem"
 const NavbarDropdownMenu = "navbar/dropdownMenu"
-const NavbarDisabledNavItem = "navbar/disabledNavItem"
+const NavbarDropdownItem = "navbar/dropdownItem"
+const NavbarDropdownDivider = "navbar/dropdownDivider"
 const NavbarSearchForm = "navbar/searchForm"
 
 func Navbar(r nap.Router) {
@@ -16,9 +18,11 @@ func Navbar(r nap.Router) {
 	r.ElmFunc(NavbarItems, Items)
 	r.ElmFunc(NavbarActiveNavItem, ActiveNavItem)
 	r.ElmFunc(NavbarInactiveNavItem, InactiveNavItem)
+	r.ElmFunc(NavbarDisabledNavItem, DisabledNavItem)
 	r.ElmFunc(NavbarDropdownNavItem, DropdownNavItem)
 	r.ElmFunc(NavbarDropdownMenu, DropdownMenu)
-	r.ElmFunc(NavbarDisabledNavItem, DisabledNavItem)
+	r.ElmFunc(NavbarDropdownItem, DropdownItem)
+	r.ElmFunc(NavbarDropdownDivider, DropdownDivider)
 	r.ElmFunc(NavbarSearchForm, SearchForm)
 	NavbarOverride(r)
 }
@@ -50,17 +54,17 @@ func Items(r nap.Router) nap.Elm {
 
 func ActiveNavItem(r nap.Router) nap.Elm {
 	return r.E("li").Set("class", "nav-item").
-		Append(r.E("a").
-			Set("class", "nav-link active").
-			Set("aria-current", "page").
-			Set("href", "/").
-			Append(nap.Text("Home")))
+		Append(r.E("a").Set("class", "nav-link active").Set("aria-current", "page"))
 }
 
 func InactiveNavItem(r nap.Router) nap.Elm {
 	return r.E("li").Set("class", "nav-item").
-		Append(r.E("a").Set("class", "nav-link").Set("href", "/").
-			Append(nap.Text("Link")))
+		Append(r.E("a").Set("class", "nav-link"))
+}
+
+func DisabledNavItem(r nap.Router) nap.Elm {
+	return r.E("li").Set("class", "nav-item").
+		Append(r.E("a").Set("class", "nav-link disabled").Set("aria-disabled", "true"))
 }
 
 func DropdownNavItem(r nap.Router) nap.Elm {
@@ -76,25 +80,18 @@ func DropdownNavItem(r nap.Router) nap.Elm {
 }
 
 func DropdownMenu(r nap.Router) nap.Elm {
-	return r.E("ul").Set("class", "dropdown-menu").
-		Append(
-			r.E("li").
-				Append(r.E("a").Set("class", "dropdown-item").Set("href", "/").
-					Append(nap.Text("Action"))),
-			r.E("li").
-				Append(r.E("a").Set("class", "dropdown-item").Set("href", "/").
-					Append(nap.Text("Another action"))),
-			r.E("li").
-				Append(r.E("hr").Set("class", "dropdown-divider")),
-			r.E("li").
-				Append(r.E("a").Set("class", "dropdown-item").Set("href", "/").
-					Append(nap.Text("Something else here"))))
+	return r.E("ul").Set("class", "dropdown-menu")
 }
 
-func DisabledNavItem(r nap.Router) nap.Elm {
-	return r.E("li").Set("class", "nav-item").
-		Append(r.E("a").Set("class", "nav-link disabled").Set("aria-disabled", "true").
-			Append(nap.Text("Disabled")))
+func DropdownItem(r nap.Router) nap.Elm {
+	return r.E("li").
+		Append(r.E("a").Set("class", "dropdown-item").Set("href", "/").
+			Append(nap.Text("Action")))
+}
+
+func DropdownDivider(r nap.Router) nap.Elm {
+	return r.E("li").
+		Append(r.E("hr").Set("class", "dropdown-divider"))
 }
 
 func SearchForm(r nap.Router) nap.Elm {

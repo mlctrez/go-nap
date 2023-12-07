@@ -41,6 +41,14 @@ func NavbarOverride(r nap.Router) {
 			}
 			navItems.Append(r.NavLink(item, ni.url, ni.name))
 		}
+
+		dropDown := r.Elm(NavbarDropdownNavItem)
+		ul := dropDown.First("ul")
+		ul.Append(r.NavLink(r.Elm(NavbarDropdownItem), "/", "home"))
+		ul.Append(r.Elm(NavbarDropdownDivider))
+		ul.Append(r.NavLink(r.Elm(NavbarDropdownItem), "/other", "other"))
+		navItems.Append(dropDown)
+
 		return navItems
 	})
 }
