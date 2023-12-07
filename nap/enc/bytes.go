@@ -50,6 +50,9 @@ func (b *bytesEncoder) EncodePage(el Encode) (err error) {
 	if err = b.enc.EncodeToken(xml.Directive("DOCTYPE html")); err != nil {
 		return err
 	}
+	if err = b.enc.EncodeToken(xml.CharData("\n")); err != nil {
+		return err
+	}
 	return b.Encode(el)
 }
 

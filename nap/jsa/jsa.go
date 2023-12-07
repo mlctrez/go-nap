@@ -10,29 +10,32 @@ import (
 
 type value struct {
 	nodeName string
-	attr     map[string]any
+	attr     []xml.Attr
 	children []*value
 }
 
-func (v *value) Encode(enc *xml.Encoder) error {
+func (v *value) getAttr(name string) string {
+	for _, attr := range v.attr {
+		if attr.Name.Local == name {
+			return attr.Value
+		}
+	}
+	return ""
+}
+
+func (v *value) Encode(enc *xml.Encoder) (err error) {
 
 	if v.nodeName == "#text" {
-		return enc.EncodeToken(xml.CharData(v.attr["data"].(string)))
+		return enc.EncodeToken(xml.CharData(v.getAttr("data")))
 	}
-
 	name := xml.Name{Local: v.nodeName}
-	var attrs []xml.Attr
-	for k, v := range v.attr {
-		attrs = append(attrs, xml.Attr{Name: xml.Name{Local: k}, Value: fmt.Sprintf("%v", v)})
-	}
-	err := enc.EncodeToken(xml.StartElement{Name: name, Attr: attrs})
-	if err != nil {
+
+	if err = enc.EncodeToken(xml.StartElement{Name: name, Attr: v.attr}); err != nil {
 		return err
 	}
 
 	for _, child := range v.children {
-		err = child.Encode(enc)
-		if err != nil {
+		if err = child.Encode(enc); err != nil {
 			return err
 		}
 	}
@@ -62,11 +65,7 @@ func createElementNS(ns, name string) Value {
 }
 
 func createTextNode(data string) Value {
-	v := &value{nodeName: "#text"}
-	if v.attr == nil {
-		v.attr = make(map[string]any)
-	}
-	v.attr["data"] = data
+	v := &value{nodeName: "#text", attr: []xml.Attr{{Name: xml.Name{Local: "data"}, Value: data}}}
 	return v
 }
 
@@ -93,10 +92,17 @@ func elById(id string) Value {
 }
 
 func (v *value) Set(name string, val any) {
-	if v.attr == nil {
-		v.attr = make(map[string]any)
+	switch vt := val.(type) {
+	case string:
+		for _, attr := range v.attr {
+			if attr.Name.Local == name {
+				attr.Value = vt
+				return
+			}
+		}
+		attr := xml.Attr{Name: xml.Name{Local: name}, Value: vt}
+		v.attr = append(v.attr, attr)
 	}
-	v.attr[name] = val
 }
 
 func (v *value) Get(name string) Value {

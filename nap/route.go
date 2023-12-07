@@ -118,7 +118,7 @@ func (r *router) Override(name string, override ElmFunc) {
 }
 
 func (r *router) Navigate(u *url.URL) {
-	fmt.Println("navigate", u)
+	//fmt.Println("navigate", u)
 	jsa.AddHistory(u.String())
 	jsa.Body().Call("replaceWith", r.Body(u))
 }

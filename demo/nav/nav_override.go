@@ -7,6 +7,9 @@ import (
 )
 
 func NavbarOverride(r nap.Router) {
+	r.Override(NavbarNav, func(r nap.Router) nap.Elm {
+		return r.NavLink(r.ElmOrig(NavbarNav), "/", "NAP")
+	})
 	r.Override(NavbarSearchForm, func(r nap.Router) nap.Elm {
 		searchForm := r.ElmOrig(NavbarSearchForm)
 		return searchForm.Listen("submit", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
