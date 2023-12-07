@@ -66,6 +66,7 @@ func Generate(html string) (err error) {
 	}
 
 	rRouter := jen.Id("r").Qual(NapPkg, "Router")
+	goFilePath := strings.TrimSuffix(html, ".html") + ".go"
 	f.Func().Id(uc(pfx)).Params(rRouter).
 		BlockFunc(func(group *jen.Group) {
 			for _, dn := range allDataNap {
@@ -89,6 +90,13 @@ func Generate(html string) (err error) {
 					jen.Id(uc(pfx)+uc(dn.DataNap())), methodName,
 				)
 			}
+			overrideFile := filepath.Join(
+				filepath.Dir(goFilePath),
+				strings.Replace(filepath.Base(goFilePath), ".go", "o.go", 1),
+			)
+			if _, err = os.Stat(overrideFile); err == nil {
+				group.Id(uc(pfx) + "Override").Params(jen.Id("r"))
+			}
 		})
 
 	for _, dn := range allDataNap {
@@ -99,7 +107,7 @@ func Generate(html string) (err error) {
 	}
 
 	var outFile *os.File
-	if outFile, err = os.Create(strings.TrimSuffix(html, ".html") + ".go"); err != nil {
+	if outFile, err = os.Create(goFilePath); err != nil {
 		return err
 	}
 	defer func() { _ = outFile.Close() }()
@@ -109,6 +117,78 @@ func Generate(html string) (err error) {
 	}
 
 	return nil
+}
+
+func (d *element) declaration(group *jen.Group) {
+
+	if d.name == "#text" {
+		group.Qual(NapPkg, "Text").Parens(jen.Lit(d.Get("data")))
+		return
+	}
+
+	var ret *jen.Statement
+
+	if os.Getenv("NEWSTYLE") != "" {
+		ret = group.Id("r").Dot("E").ParamsFunc(func(g *jen.Group) {
+			attributes := d.FilterAttributes("data-nap")
+			switch len(attributes) {
+			case 0:
+				g.Lit(d.name)
+			case 1, 2, 3:
+				argMap := g.Lit(d.name).Op(",").Qual(NapPkg, "M").Op("{")
+				defer argMap.Op("}")
+				for i, attr := range attributes {
+					if i > 0 {
+						argMap.Op(",")
+					}
+					argMap.Lit(attr.Name.Local).Op(":").Lit(attr.Value)
+				}
+			default:
+				g.Lit(d.name).Op(",").Qual(NapPkg, "M").BlockFunc(func(group *jen.Group) {
+					for _, attr := range attributes {
+						group.Lit(attr.Name.Local).Op(":").Lit(attr.Value).Op(",")
+					}
+				})
+			}
+		})
+	} else {
+		if d.newLine {
+			ret = group.Line().Id("r").Dot("E").Params(jen.Lit(d.name))
+		} else {
+			ret = group.Id("r").Dot("E").Params(jen.Lit(d.name))
+		}
+
+		filterAttributes := d.FilterAttributes("data-nap")
+		newLine := len(filterAttributes) > 2
+		for _, attr := range filterAttributes {
+			if newLine {
+				ret.Op(".").Line().Id("Set").Params(jen.Lit(attr.Name.Local), jen.Lit(attr.Value))
+			} else {
+				ret.Dot("Set").Params(jen.Lit(attr.Name.Local), jen.Lit(attr.Value))
+			}
+		}
+	}
+	prefix := d.ParentDataNap("prefix")
+	if len(d.children) > 0 {
+		filteredChildren := d.FilterChildren("omit")
+		if len(filteredChildren) > 0 {
+			ret.Op(".").Line().Id("Append").ParamsFunc(func(group *jen.Group) {
+				var newLine = len(filteredChildren) > 1
+				for _, child := range filteredChildren {
+					if child.DataNap() != "" {
+						if newLine {
+							group.Line().Id("r").Dot("Elm").Params(jen.Id(uc(prefix) + uc(child.DataNap())))
+						} else {
+							group.Id("r").Dot("Elm").Params(jen.Id(uc(prefix) + uc(child.DataNap())))
+						}
+					} else {
+						child.newLine = newLine
+						child.declaration(group)
+					}
+				}
+			})
+		}
+	}
 }
 
 func uc(in string) string {
@@ -169,6 +249,7 @@ type element struct {
 	attributes []xml.Attr
 	parent     *element
 	children   []*element
+	newLine    bool
 }
 
 func (d *element) appendChild(el *element) {
@@ -252,51 +333,4 @@ func (d *element) FilterChildren(suffix string) []*element {
 		}
 	}
 	return result
-}
-
-func (d *element) declaration(group *jen.Group) {
-	if d.name == "#text" {
-		group.Qual(NapPkg, "Text").Parens(jen.Lit(d.Get("data")))
-		return
-	}
-
-	ret := group.Id("r")
-	ret.Op(".").Line().Id("E").ParamsFunc(func(g *jen.Group) {
-		attributes := d.FilterAttributes("data-nap")
-		switch len(attributes) {
-		case 0:
-			g.Lit(d.name)
-		case 1, 2, 3:
-			argMap := g.Lit(d.name).Op(",").Qual(NapPkg, "M").Op("{")
-			defer argMap.Op("}")
-			for i, attr := range attributes {
-				if i > 0 {
-					argMap.Op(",")
-				}
-				argMap.Lit(attr.Name.Local).Op(":").Lit(attr.Value)
-			}
-		default:
-			g.Lit(d.name).Op(",").Qual(NapPkg, "M").BlockFunc(func(group *jen.Group) {
-				for _, attr := range attributes {
-					group.Lit(attr.Name.Local).Op(":").Lit(attr.Value).Op(",")
-				}
-			})
-		}
-
-	})
-	prefix := d.ParentDataNap("prefix")
-	if len(d.children) > 0 {
-		filteredChildren := d.FilterChildren("omit")
-		if len(filteredChildren) > 0 {
-			ret.Op(".").Line().Id("Append").ParamsFunc(func(group *jen.Group) {
-				for _, child := range filteredChildren {
-					if child.DataNap() != "" {
-						group.Id("r").Op(".").Line().Id("Elm").Params(jen.Id(uc(prefix) + uc(child.DataNap())))
-					} else {
-						child.declaration(group)
-					}
-				}
-			})
-		}
-	}
 }

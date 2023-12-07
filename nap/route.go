@@ -19,8 +19,11 @@ type Router interface {
 
 	ElmFunc(name string, elmFunc ElmFunc)
 	Elm(name string) Elm
+	ElmOrig(name string) Elm
 
 	Page(u *url.URL) Elm
+
+	Override(name string, elmFunc ElmFunc)
 
 	E(nodeName string, attr ...M) Elm
 }
@@ -90,8 +93,29 @@ func (r *router) Elm(name string) Elm {
 		Text(fmt.Sprintf("element %q not found", name))
 }
 
+func (r *router) ElmOrig(name string) Elm {
+	if ef, ok := r.components[name+"Orig"]; ok {
+		return ef(r)
+	}
+	if strings.HasPrefix(name, "_body") {
+		return El("body", M{"style": "color:red"}).
+			Text(fmt.Sprintf("element %q not found", name))
+	}
+	return El("div", M{"style": "color:red"}).
+		Text(fmt.Sprintf("element %q not found", name))
+}
+
 func (r *router) ElmFunc(name string, elmFunc ElmFunc) {
 	r.components[name] = elmFunc
+	r.components[name+"Orig"] = elmFunc
+}
+
+func (r *router) Override(name string, override ElmFunc) {
+	if _, ok := r.components[name]; !ok {
+		panic(fmt.Sprintf("component %q does not exist", name))
+	} else {
+		r.components[name] = override
+	}
 }
 
 func (r *router) Navigate(u *url.URL) {
