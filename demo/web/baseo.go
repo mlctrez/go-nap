@@ -7,17 +7,20 @@ import (
 )
 
 func BaseOverride(r nap.Router) {
-
-	// TODO: move these into html declarations
-
-	r.ElmFunc("_page/", func(r nap.Router) nap.Elm {
-		return r.Elm(BaseHtml).Append(r.Elm("_body/"))
-	})
-	r.ElmFunc("_body/", func(r nap.Router) nap.Elm {
+	pageAndBody(r, "/", func(r nap.Router) nap.Elm {
 		return r.E("body").Append(
 			r.Elm(nav.NavbarNav),
 			r.Elm(components.CompoDropdown),
 		)
 	})
+	pageAndBody(r, "/other", func(r nap.Router) nap.Elm {
+		return r.E("body").Append(
+			r.Elm(nav.NavbarNav),
+		)
+	})
+}
 
+func pageAndBody(r nap.Router, u string, elmFunc nap.ElmFunc) {
+	r.ElmFunc("_page"+u, func(r nap.Router) nap.Elm { return r.Elm(BaseHtml).Append(r.Elm("_body" + u)) })
+	r.ElmFunc("_body"+u, elmFunc)
 }

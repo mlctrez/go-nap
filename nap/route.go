@@ -24,6 +24,7 @@ type Router interface {
 	Page(u *url.URL) Elm
 
 	Override(name string, elmFunc ElmFunc)
+	NavLink(el Elm, u, text string) Elm
 
 	E(nodeName string, attr ...M) Elm
 }
@@ -44,26 +45,24 @@ type router struct {
 	ops        chan func()
 }
 
-func (r *router) E(nodeName string, attr ...M) Elm {
-	el := El(nodeName, attr...)
-	for _, at := range attr {
-		for k, v := range at {
-			if k == "href" {
-				if _, ok := v.(string); ok {
-					el.Listen("click", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
-						args[0].PreventDefault()
-						u, err := url.Parse(this.Get("href").String())
-						if err == nil {
-							r.Navigate(u)
-						}
-						return nil
-					}))
-					//el.Listen("click", r.NavigateFunc(&url.URL{Path: href}))
-				}
-			}
-		}
+func (r *router) NavLink(el Elm, u, text string) Elm {
+	anchor := el.First("a")
+	if len(anchor.Children()) == 0 {
+		anchor.Append(Text(text))
+	} else {
+		anchor.ReplaceChild(anchor.Children()[0], Text(text))
 	}
+	anchor.Set("href", u)
+	anchor.Listen("click", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
+		args[0].PreventDefault()
+		r.Navigate(&url.URL{Path: u})
+		return nil
+	}))
 	return el
+}
+
+func (r *router) E(nodeName string, attr ...M) Elm {
+	return El(nodeName, attr...)
 }
 
 func (r *router) Page(u *url.URL) Elm {

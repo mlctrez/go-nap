@@ -19,4 +19,25 @@ func NavbarOverride(r nap.Router) {
 			return nil
 		}))
 	})
+	r.Override(NavbarItems, func(r nap.Router) nap.Elm {
+		navList := []struct {
+			url  string
+			name string
+		}{
+			{url: "/", name: "home"},
+			{url: "/other", name: "other"},
+		}
+		navItems := r.ElmOrig(NavbarItems)
+		path := jsa.CurrentURL().Path
+		for _, ni := range navList {
+			var item nap.Elm
+			if ni.url == path {
+				item = r.ElmOrig(NavbarActiveNavItem)
+			} else {
+				item = r.ElmOrig(NavbarInactiveNavItem)
+			}
+			navItems.Append(r.NavLink(item, ni.url, ni.name))
+		}
+		return navItems
+	})
 }
