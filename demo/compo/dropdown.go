@@ -2,14 +2,14 @@ package compo
 
 import nap "github.com/mlctrez/go-nap/nap"
 
-const CDropdownMain = "dropdown/main"
-const CDropdownMenu = "dropdown/menu"
-const CDropdownDropdownItem = "dropdown/dropdownItem"
+const EDropdownMain = "dropdown/main"
+const EDropdownMenu = "dropdown/menu"
+const EDropdownDropdownItem = "dropdown/dropdownItem"
 
 func Dropdown(r nap.Router) {
-	r.ElmFunc(CDropdownMain, DropdownMain)
-	r.ElmFunc(CDropdownMenu, DropdownMenu)
-	r.ElmFunc(CDropdownDropdownItem, DropdownDropdownItem)
+	r.ElmFunc(EDropdownMain, DropdownMain)
+	r.ElmFunc(EDropdownMenu, DropdownMenu)
+	r.ElmFunc(EDropdownDropdownItem, DropdownDropdownItem)
 	DropdownOverride(r)
 }
 
@@ -22,7 +22,7 @@ func DropdownMain(r nap.Router) nap.Elm {
 				Set("data-bs-toggle", "dropdown").
 				Set("aria-expanded", "false").
 				Append(nap.Text("Dropdown")),
-			r.Elm(CDropdownMenu))
+			r.Elm(EDropdownMenu))
 }
 
 func DropdownMenu(r nap.Router) nap.Elm {

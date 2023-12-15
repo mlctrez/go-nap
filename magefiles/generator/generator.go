@@ -40,6 +40,8 @@ func walk(path string, info fs.FileInfo, walkErr error) (err error) {
 
 const NapPkg = "github.com/mlctrez/go-nap/nap"
 
+const CPrefix = "E"
+
 func Generate(html string) (err error) {
 
 	var open *os.File
@@ -62,7 +64,7 @@ func Generate(html string) (err error) {
 
 	allDataNap := root.allDataNap()
 	for _, dn := range allDataNap {
-		f.Const().Id("C" + uc(pfx) + uc(dn.DataNap())).Op("=").Lit(pfx + "/" + dn.DataNap())
+		f.Const().Id(CPrefix + uc(pfx) + uc(dn.DataNap())).Op("=").Lit(pfx + "/" + dn.DataNap())
 	}
 
 	rRouter := jen.Id("r").Qual(NapPkg, "Router")
@@ -95,7 +97,7 @@ func Generate(html string) (err error) {
 				//}
 
 				group.Id("r").Dot("ElmFunc").Params(
-					jen.Id("C"+uc(pfx)+uc(dn.DataNap())), methodName,
+					jen.Id(CPrefix+uc(pfx)+uc(dn.DataNap())), methodName,
 				)
 			}
 			if root.DataNap("override") != "" {
@@ -156,7 +158,7 @@ func (d *element) declaration(group *jen.Group) {
 				var newLine = len(filteredChildren) > 1
 				for _, child := range filteredChildren {
 					if child.DataNap() != "" {
-						id := jen.Id("C" + uc(prefix) + uc(child.DataNap()))
+						id := jen.Id(CPrefix + uc(prefix) + uc(child.DataNap()))
 						if newLine {
 							group.Line().Id("r").Dot("Elm").Params(id)
 						} else {

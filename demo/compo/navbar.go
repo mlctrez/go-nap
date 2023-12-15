@@ -2,28 +2,28 @@ package compo
 
 import nap "github.com/mlctrez/go-nap/nap"
 
-const CNavbarNav = "navbar/nav"
-const CNavbarItems = "navbar/items"
-const CNavbarActiveNavItem = "navbar/activeNavItem"
-const CNavbarInactiveNavItem = "navbar/inactiveNavItem"
-const CNavbarDisabledNavItem = "navbar/disabledNavItem"
-const CNavbarDropdownNavItem = "navbar/dropdownNavItem"
-const CNavbarDropdownMenu = "navbar/dropdownMenu"
-const CNavbarDropdownItem = "navbar/dropdownItem"
-const CNavbarDropdownDivider = "navbar/dropdownDivider"
-const CNavbarSearchForm = "navbar/searchForm"
+const ENavbarNav = "navbar/nav"
+const ENavbarItems = "navbar/items"
+const ENavbarActiveNavItem = "navbar/activeNavItem"
+const ENavbarInactiveNavItem = "navbar/inactiveNavItem"
+const ENavbarDisabledNavItem = "navbar/disabledNavItem"
+const ENavbarDropdownNavItem = "navbar/dropdownNavItem"
+const ENavbarDropdownMenu = "navbar/dropdownMenu"
+const ENavbarDropdownItem = "navbar/dropdownItem"
+const ENavbarDropdownDivider = "navbar/dropdownDivider"
+const ENavbarSearchForm = "navbar/searchForm"
 
 func Navbar(r nap.Router) {
-	r.ElmFunc(CNavbarNav, NavbarNav)
-	r.ElmFunc(CNavbarItems, NavbarItems)
-	r.ElmFunc(CNavbarActiveNavItem, NavbarActiveNavItem)
-	r.ElmFunc(CNavbarInactiveNavItem, NavbarInactiveNavItem)
-	r.ElmFunc(CNavbarDisabledNavItem, NavbarDisabledNavItem)
-	r.ElmFunc(CNavbarDropdownNavItem, NavbarDropdownNavItem)
-	r.ElmFunc(CNavbarDropdownMenu, NavbarDropdownMenu)
-	r.ElmFunc(CNavbarDropdownItem, NavbarDropdownItem)
-	r.ElmFunc(CNavbarDropdownDivider, NavbarDropdownDivider)
-	r.ElmFunc(CNavbarSearchForm, NavbarSearchForm)
+	r.ElmFunc(ENavbarNav, NavbarNav)
+	r.ElmFunc(ENavbarItems, NavbarItems)
+	r.ElmFunc(ENavbarActiveNavItem, NavbarActiveNavItem)
+	r.ElmFunc(ENavbarInactiveNavItem, NavbarInactiveNavItem)
+	r.ElmFunc(ENavbarDisabledNavItem, NavbarDisabledNavItem)
+	r.ElmFunc(ENavbarDropdownNavItem, NavbarDropdownNavItem)
+	r.ElmFunc(ENavbarDropdownMenu, NavbarDropdownMenu)
+	r.ElmFunc(ENavbarDropdownItem, NavbarDropdownItem)
+	r.ElmFunc(ENavbarDropdownDivider, NavbarDropdownDivider)
+	r.ElmFunc(ENavbarSearchForm, NavbarSearchForm)
 	NavbarOverride(r)
 }
 
@@ -44,8 +44,8 @@ func NavbarNav(r nap.Router) nap.Elm {
 					Append(r.E("span").Set("class", "navbar-toggler-icon")),
 				r.E("div").Set("class", "collapse navbar-collapse").Set("id", "navbarSupportedContent").
 					Append(
-						r.Elm(CNavbarItems),
-						r.Elm(CNavbarSearchForm))))
+						r.Elm(ENavbarItems),
+						r.Elm(ENavbarSearchForm))))
 }
 
 func NavbarItems(r nap.Router) nap.Elm {
@@ -76,7 +76,7 @@ func NavbarDropdownNavItem(r nap.Router) nap.Elm {
 				Set("data-bs-toggle", "dropdown").
 				Set("aria-expanded", "false").
 				Append(nap.Text("Dropdown")),
-			r.Elm(CNavbarDropdownMenu))
+			r.Elm(ENavbarDropdownMenu))
 }
 
 func NavbarDropdownMenu(r nap.Router) nap.Elm {

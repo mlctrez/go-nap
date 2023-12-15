@@ -2,18 +2,18 @@ package web
 
 import nap "github.com/mlctrez/go-nap/nap"
 
-const CBaseHtml = "base/html"
-const CBaseHeader = "base/header"
+const EBaseHtml = "base/html"
+const EBaseHeader = "base/header"
 
 func Base(r nap.Router) {
-	r.ElmFunc(CBaseHtml, BaseHtml)
-	r.ElmFunc(CBaseHeader, BaseHeader)
+	r.ElmFunc(EBaseHtml, BaseHtml)
+	r.ElmFunc(EBaseHeader, BaseHeader)
 	BaseOverride(r)
 }
 
 func BaseHtml(r nap.Router) nap.Elm {
 	return r.E("html").Set("data-bs-theme", "dark").Set("lang", "en").
-		Append(r.Elm(CBaseHeader))
+		Append(r.Elm(EBaseHeader))
 }
 
 func BaseHeader(r nap.Router) nap.Elm {

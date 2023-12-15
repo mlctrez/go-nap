@@ -2,11 +2,18 @@ package compo
 
 import nap "github.com/mlctrez/go-nap/nap"
 
-const CSignInMain = "signIn/main"
+const ESignInBody = "signIn/body"
+const ESignInMain = "signIn/main"
 
 func SignIn(r nap.Router) {
-	r.ElmFunc(CSignInMain, SignInMain)
+	r.ElmFunc(ESignInBody, SignInBody)
+	r.ElmFunc(ESignInMain, SignInMain)
 	SignInOverride(r)
+}
+
+func SignInBody(r nap.Router) nap.Elm {
+	return r.E("body").Set("class", "d-flex align-items-center py-4 bg-body-tertiary").
+		Append(r.Elm(ESignInMain))
 }
 
 func SignInMain(r nap.Router) nap.Elm {

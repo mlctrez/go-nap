@@ -6,21 +6,11 @@ import (
 )
 
 func BaseOverride(r nap.Router) {
-	pageAndBody(r, "/", func(r nap.Router) nap.Elm {
-		return r.E("body").Set("class", "d-flex align-items-center py-4 bg-body-tertiary").Append(
-			r.Elm(compo.CSignInMain),
-			//r.Elm(nav.NavbarNav),
-			//r.Elm(components.CompoDropdown),
-		)
-	})
-	pageAndBody(r, "/other", func(r nap.Router) nap.Elm {
-		return r.E("body").Append(
-			r.Elm(compo.CNavbarNav),
-		)
-	})
+	pageAndBody(r, "/", func(r nap.Router) nap.Elm { return r.Elm(compo.ESignInBody) })
+	pageAndBody(r, "/other", func(r nap.Router) nap.Elm { return r.E("body").Append(r.Elm(compo.ENavbarNav)) })
 }
 
 func pageAndBody(r nap.Router, u string, elmFunc nap.ElmFunc) {
-	r.ElmFunc("_page"+u, func(r nap.Router) nap.Elm { return r.Elm(CBaseHtml).Append(r.Elm("_body" + u)) })
+	r.ElmFunc("_page"+u, func(r nap.Router) nap.Elm { return r.Elm(EBaseHtml).Append(r.Elm("_body" + u)) })
 	r.ElmFunc("_body"+u, elmFunc)
 }

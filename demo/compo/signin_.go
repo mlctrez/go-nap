@@ -7,8 +7,8 @@ import (
 )
 
 func SignInOverride(r nap.Router) {
-	r.Override(CSignInMain, func(r nap.Router) nap.Elm {
-		m := r.ElmOrig(CSignInMain)
+	r.Override(ESignInMain, func(r nap.Router) nap.Elm {
+		m := r.ElmOrig(ESignInMain)
 		m.First("form").Listen("submit", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
 			args[0].PreventDefault()
 			if m.First("input").Value().Get("value").String() != "" {
