@@ -61,6 +61,7 @@ type Value interface {
 	Encode(encoder *xml.Encoder) error
 	PreventDefault()
 	IsNull() bool
+	Bool() bool
 }
 
 func FuncOf(input func(this Value, args []Value) any) Func {

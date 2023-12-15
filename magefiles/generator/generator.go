@@ -62,7 +62,7 @@ func Generate(html string) (err error) {
 
 	allDataNap := root.allDataNap()
 	for _, dn := range allDataNap {
-		f.Const().Id(uc(pfx) + uc(dn.DataNap())).Op("=").Lit(pfx + "/" + dn.DataNap())
+		f.Const().Id("C" + uc(pfx) + uc(dn.DataNap())).Op("=").Lit(pfx + "/" + dn.DataNap())
 	}
 
 	rRouter := jen.Id("r").Qual(NapPkg, "Router")
@@ -78,24 +78,24 @@ func Generate(html string) (err error) {
 	f.Func().Id(uc(pfx)).Params(rRouter).
 		BlockFunc(func(group *jen.Group) {
 			for _, dn := range allDataNap {
-				methodName := jen.Id(uc(dn.DataNap()))
+				methodName := jen.Id(uc(pfx) + uc(dn.DataNap()))
 
-				dnPage := dn.DataNap("page")
-				if dnPage != "" {
-					group.Id("r").Dot("ElmFunc").Params(
-						jen.Id("page-"+dnPage), methodName,
-					)
-				}
-
-				dnBody := dn.DataNap("body")
-				if dnBody != "" {
-					group.Id("r").Dot("ElmFunc").Params(
-						jen.Id("body-"+dnBody), methodName,
-					)
-				}
+				//dnPage := dn.DataNap("page")
+				//if dnPage != "" {
+				//	group.Id("r").Dot("ElmFunc").Params(
+				//		jen.Id("page-"+dnPage), methodName,
+				//	)
+				//}
+				//
+				//dnBody := dn.DataNap("body")
+				//if dnBody != "" {
+				//	group.Id("r").Dot("ElmFunc").Params(
+				//		jen.Id("body-"+dnBody), methodName,
+				//	)
+				//}
 
 				group.Id("r").Dot("ElmFunc").Params(
-					jen.Id(uc(pfx)+uc(dn.DataNap())), methodName,
+					jen.Id("C"+uc(pfx)+uc(dn.DataNap())), methodName,
 				)
 			}
 			if root.DataNap("override") != "" {
@@ -105,7 +105,7 @@ func Generate(html string) (err error) {
 
 	for _, dn := range allDataNap {
 		f.Line()
-		f.Func().Id(uc(dn.DataNap())).
+		f.Func().Id(uc(pfx)+uc(dn.DataNap())).
 			Params(rRouter).Qual(NapPkg, "Elm").
 			Block(jen.ReturnFunc(dn.declaration))
 	}
@@ -156,10 +156,11 @@ func (d *element) declaration(group *jen.Group) {
 				var newLine = len(filteredChildren) > 1
 				for _, child := range filteredChildren {
 					if child.DataNap() != "" {
+						id := jen.Id("C" + uc(prefix) + uc(child.DataNap()))
 						if newLine {
-							group.Line().Id("r").Dot("Elm").Params(jen.Id(uc(prefix) + uc(child.DataNap())))
+							group.Line().Id("r").Dot("Elm").Params(id)
 						} else {
-							group.Id("r").Dot("Elm").Params(jen.Id(uc(prefix) + uc(child.DataNap())))
+							group.Id("r").Dot("Elm").Params(id)
 						}
 					} else {
 						child.newLine = newLine

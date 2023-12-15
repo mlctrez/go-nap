@@ -40,6 +40,8 @@ func NewRouter(rf ...RegFunc) Router {
 	return r
 }
 
+var _ Router = (*router)(nil)
+
 type router struct {
 	components map[string]ElmFunc
 	ops        chan func()
@@ -55,7 +57,7 @@ func (r *router) NavLink(el Elm, u, text string) Elm {
 	anchor.Set("href", u)
 	anchor.Listen("click", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
 		args[0].PreventDefault()
-		r.Navigate(&url.URL{Path: u})
+		r.QueueOp(func() { r.Navigate(&url.URL{Path: u}) })
 		return nil
 	}))
 	return el

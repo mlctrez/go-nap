@@ -36,14 +36,6 @@ type M map[string]any
 
 type ElmFunc func(r Router) Elm
 
-type elem struct {
-	nodeName  string
-	node      jsa.Value
-	children  []Elm
-	events    []jsa.Func
-	fnRelease jsa.Func
-}
-
 func elFinalizer(e *elem) {
 	fmt.Println("finalizing", e.nodeName)
 }
@@ -58,6 +50,20 @@ func ElNS(ns, nodeName string, attr ...M) Elm {
 	el := &elem{nodeName: nodeName, node: jsa.CreateElementNS(ns, nodeName)}
 	runtime.SetFinalizer(el, elFinalizer)
 	return el.SetAttr(attr...)
+}
+
+func Text(data string) Elm {
+	return &elem{nodeName: "#text", node: jsa.CreateTextNode(data)}
+}
+
+var _ Elm = (*elem)(nil)
+
+type elem struct {
+	nodeName  string
+	node      jsa.Value
+	children  []Elm
+	events    []jsa.Func
+	fnRelease jsa.Func
 }
 
 func (e *elem) NodeName() string {
@@ -168,14 +174,6 @@ func (e *elem) All(name string) []Elm {
 	return result
 }
 
-func (e *elem) Prepend(el ...Elm) Elm {
-	for _, child := range el {
-		e.node.Call("prepend", child.Value())
-		e.children = append([]Elm{child}, e.children...)
-	}
-	return e
-}
-
 func (e *elem) Value() jsa.Value {
 	return e.node
 }
@@ -183,10 +181,6 @@ func (e *elem) Value() jsa.Value {
 func (e *elem) Text(data string) Elm {
 	e.Append(Text(data))
 	return e
-}
-
-func Text(data string) Elm {
-	return &elem{nodeName: "#text", node: jsa.CreateTextNode(data)}
 }
 
 func (e *elem) Listen(name string, fn jsa.Func) Elm {

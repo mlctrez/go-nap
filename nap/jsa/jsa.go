@@ -14,6 +14,10 @@ type value struct {
 	children []*value
 }
 
+func (v *value) Bool() bool {
+	return false
+}
+
 func (v *value) getAttr(name string) string {
 	for _, attr := range v.attr {
 		if attr.Name.Local == name {

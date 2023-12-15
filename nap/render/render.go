@@ -25,6 +25,7 @@ func Run(router nap.Router) {
 	mux.HandleFunc("/runtime.js", static("demo/web/runtime.js"))
 	mux.HandleFunc("/logo.svg", static("demo/web/logo.svg"))
 	mux.HandleFunc("/bootstrap.min.css", static("demo/web/bootstrap.min.css"))
+	mux.HandleFunc("/sign-in.css", static("demo/web/sign-in.css"))
 	mux.HandleFunc("/bootstrap.bundle.min.js", static("demo/web/bootstrap.bundle.min.js"))
 	mux.HandleFunc("/app.wasm", static("temp/app.wasm"))
 	if err := http.ListenAndServe(":8080", mux); err != nil {

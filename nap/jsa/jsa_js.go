@@ -74,6 +74,14 @@ func (v *value) String() string {
 	return v.value.String()
 }
 
+func (v *value) Bool() bool {
+	return v.value.Bool()
+}
+
+func (v *value) Float() float64 {
+	return v.value.Float()
+}
+
 func (v *value) PreventDefault() {
 	v.Call("preventDefault")
 }
