@@ -62,6 +62,8 @@ func Generate(html string) (err error) {
 
 	f := jen.NewFile(filepath.Base(filepath.Dir(html)))
 
+	f.HeaderComment("This code is auto generated. DO NOT EDIT.")
+
 	allDataNap := root.allDataNap()
 	for _, dn := range allDataNap {
 		f.Const().Id(CPrefix + uc(pfx) + uc(dn.DataNap())).Op("=").Lit(pfx + "/" + dn.DataNap())

@@ -1,3 +1,5 @@
+// This code is auto generated. DO NOT EDIT.
+
 package compo
 
 import nap "github.com/mlctrez/go-nap/nap"

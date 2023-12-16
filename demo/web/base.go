@@ -1,3 +1,5 @@
+// This code is auto generated. DO NOT EDIT.
+
 package web
 
 import nap "github.com/mlctrez/go-nap/nap"
