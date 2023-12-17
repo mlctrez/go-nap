@@ -3,10 +3,17 @@ package web
 import (
 	"github.com/mlctrez/go-nap/demo/compo"
 	"github.com/mlctrez/go-nap/nap"
+	"github.com/mlctrez/go-nap/nap/jsa"
 )
 
 func BaseOverride(r nap.Router) {
-	pageAndBody(r, "/", func(r nap.Router) nap.Elm { return r.Elm(compo.ESignInBody) })
+	pageAndBody(r, "/", func(r nap.Router) nap.Elm {
+		user := jsa.LocalStorage().Get("user")
+		if !user.IsNull() {
+			return r.E("body").Append(r.Elm(compo.ENavbarNav))
+		}
+		return r.Elm(compo.ESignInBody)
+	})
 	pageAndBody(r, "/other", func(r nap.Router) nap.Elm { return r.E("body").Append(r.Elm(compo.ENavbarNav)) })
 }
 

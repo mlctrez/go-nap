@@ -11,7 +11,9 @@ func SignInOverride(r nap.Router) {
 		m := r.ElmOrig(ESignInMain)
 		m.First("form").Listen("submit", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
 			args[0].PreventDefault()
-			if m.First("input").Value().Get("value").String() != "" {
+			userName := m.First("input").Value().Get("value").String()
+			if userName != "" {
+				jsa.LocalStorage().Set("user", userName)
 				r.Navigate(&url.URL{Path: "/other"})
 			}
 			return nil
