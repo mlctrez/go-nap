@@ -107,7 +107,7 @@ func makeTemp(ctx context.Context) (err error) {
 }
 
 func compileHtml(ctx context.Context) (err error) {
-	return generator.GenerateDir("demo")
+	return generator.GenerateDirs("demo", "nap")
 }
 
 func buildWasm(ctx context.Context) error {

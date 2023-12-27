@@ -95,15 +95,7 @@ func (r *router) Elm(name string) Elm {
 }
 
 func (r *router) ElmOrig(name string) Elm {
-	if ef, ok := r.components[name+"Orig"]; ok {
-		return ef(r)
-	}
-	if strings.HasPrefix(name, "_body") {
-		return El("body", M{"style": "color:red"}).
-			Text(fmt.Sprintf("element %q not found", name))
-	}
-	return El("div", M{"style": "color:red"}).
-		Text(fmt.Sprintf("element %q not found", name))
+	return r.Elm(name + "Orig")
 }
 
 func (r *router) ElmFunc(name string, elmFunc ElmFunc) {

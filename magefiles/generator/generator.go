@@ -14,8 +14,13 @@ import (
 	"strings"
 )
 
-func GenerateDir(path string) (err error) {
-	return filepath.Walk(path, walk)
+func GenerateDirs(paths ...string) (err error) {
+	for _, path := range paths {
+		if err = filepath.Walk(path, walk); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 var lineRe = regexp.MustCompile(" line ([0-9]+):")
@@ -83,23 +88,9 @@ func Generate(html string) (err error) {
 		BlockFunc(func(group *jen.Group) {
 			for _, dn := range allDataNap {
 				methodName := jen.Id(uc(pfx) + uc(dn.DataNap()))
-
-				//dnPage := dn.DataNap("page")
-				//if dnPage != "" {
-				//	group.Id("r").Dot("ElmFunc").Params(
-				//		jen.Id("page-"+dnPage), methodName,
-				//	)
-				//}
-				//
-				//dnBody := dn.DataNap("body")
-				//if dnBody != "" {
-				//	group.Id("r").Dot("ElmFunc").Params(
-				//		jen.Id("body-"+dnBody), methodName,
-				//	)
-				//}
-
 				group.Id("r").Dot("ElmFunc").Params(
-					jen.Id(CPrefix+uc(pfx)+uc(dn.DataNap())), methodName,
+					jen.Id(CPrefix+uc(pfx)+uc(dn.DataNap())),
+					methodName,
 				)
 			}
 			if root.DataNap("override") != "" {
