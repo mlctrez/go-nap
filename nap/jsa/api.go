@@ -62,6 +62,7 @@ type Value interface {
 	PreventDefault()
 	IsNull() bool
 	Bool() bool
+	Int() int
 }
 
 func FuncOf(input func(this Value, args []Value) any) Func {

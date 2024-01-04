@@ -102,7 +102,7 @@ func (e *elem) SetAttr(attr ...M) Elm {
 }
 
 func (e *elem) Set(name string, val any) Elm {
-	if name == "value" {
+	if name == "value" || name == "data-nap-id" {
 		e.node.Set(name, val)
 		return e
 	}
@@ -184,21 +184,23 @@ func (e *elem) Text(data string) Elm {
 }
 
 func (e *elem) Listen(name string, fn jsa.Func) Elm {
-	e.node.Call("addEventListener", name, e.addRelease(fn))
+	AddElem(e)
+	e.events = append(e.events, fn)
+	e.node.Call("addEventListener", name, fn)
 	return e
 }
 
-func (e *elem) addRelease(fn jsa.Func) jsa.Func {
-	if len(e.events) == 0 {
-		e.fnRelease = jsa.FuncOf(func(_ jsa.Value, _ []jsa.Value) any {
-			for _, ev := range e.events {
-				ev.Release()
-			}
-			e.fnRelease.Release()
-			return nil
-		})
-		e.node.Set("napRelease", e.fnRelease)
-	}
-	e.events = append(e.events, fn)
-	return fn
-}
+//func (e *elem) addRelease(fn jsa.Func) jsa.Func {
+//	if len(e.events) == 0 {
+//		e.fnRelease = jsa.FuncOf(func(_ jsa.Value, _ []jsa.Value) any {
+//			for _, ev := range e.events {
+//				ev.Release()
+//			}
+//			e.fnRelease.Release()
+//			return nil
+//		})
+//		e.node.Set("napRelease", e.fnRelease)
+//	}
+//	e.events = append(e.events, fn)
+//	return fn
+//}

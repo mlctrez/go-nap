@@ -7,6 +7,12 @@ import (
 )
 
 func Run(router nap.Router) {
+	jsa.Global().Set("napReleaseId", jsa.FuncOf(func(this jsa.Value, args []jsa.Value) any {
+		i := args[0].Int()
+		//fmt.Println("release", i)
+		nap.ReleaseElem(uint64(i))
+		return nil
+	}))
 	jsa.Call("napInit", true)
 	navCurrent := func() { router.Navigate(jsa.CurrentURL()) }
 	jsa.OnPopState(navCurrent)

@@ -28,10 +28,18 @@ const napReleaseObserver = new MutationObserver(function (mutations, observer) {
 
 const ReleaseFunc = "napRelease"
 
+napReleaseId = function (id) {
+  console.log("napReleaseId not overridden", id)
+}
+
 function napReleaseNode(node) {
   node.childNodes.forEach(napReleaseNode)
-  if (ReleaseFunc in node) {
-    node[ReleaseFunc]()
+  if ("data-nap-id" in node) {
+    // console.log("napReleaseNode", node["data-nap-id"] )
+    napReleaseId(node["data-nap-id"])
   }
+  // if (ReleaseFunc in node) {
+  //   node[ReleaseFunc]()
+  // }
 }
 

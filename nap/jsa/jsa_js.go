@@ -74,6 +74,10 @@ func (v *value) String() string {
 	return v.value.String()
 }
 
+func (v *value) Int() int {
+	return v.value.Int()
+}
+
 func (v *value) Bool() bool {
 	return v.value.Bool()
 }

@@ -18,6 +18,10 @@ func (v *value) Bool() bool {
 	return false
 }
 
+func (v *value) Int() int {
+	return 0
+}
+
 func (v *value) getAttr(name string) string {
 	for _, attr := range v.attr {
 		if attr.Name.Local == name {
